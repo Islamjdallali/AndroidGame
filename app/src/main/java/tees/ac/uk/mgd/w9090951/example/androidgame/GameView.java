@@ -7,6 +7,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Rect;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
@@ -21,6 +22,7 @@ public class GameView extends SurfaceView implements Runnable {
     private int frameW = 800;
     private int frameH = 800;
     private int frameCount = 1;
+    private int currentFrame = 0;
     private boolean isMoving;
     private float xPos = 800;
     private float yPos = 800;
@@ -28,6 +30,8 @@ public class GameView extends SurfaceView implements Runnable {
     private Rect frameToDraw = new Rect(0,0,frameW,frameH);
     private Rect whereToDraw = new Rect((int)xPos,(int)yPos, (int)xPos + frameW, frameH);
     private Canvas canvas;
+    private float lastFrameChangeTime = 1;
+    private float frameLengthInMs = 2;
 
     public GameView(Context context) {
         super(context);
@@ -85,6 +89,31 @@ public class GameView extends SurfaceView implements Runnable {
     private void manageFrame()
     {
         long time = System.currentTimeMillis();
+        if (time > lastFrameChangeTime + frameLengthInMs)
+        {
+            lastFrameChangeTime = time;
+            currentFrame++;
+            if (currentFrame >= frameCount)
+            {
+                currentFrame = 0;
+            }
+        }
+
+        frameToDraw.left = currentFrame * frameW;
+        frameToDraw.right = frameToDraw.left + frameW;
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event)
+    {
+        switch (event.getAction() & MotionEvent.ACTION_MASK)
+        {
+            case MotionEvent.ACTION_DOWN:
+                isMoving = !isMoving;
+                break;
+        }
+
+        return true;
     }
 
 
