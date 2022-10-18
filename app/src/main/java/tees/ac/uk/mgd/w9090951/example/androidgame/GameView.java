@@ -8,13 +8,37 @@ public class GameView extends SurfaceView implements Runnable {
 
     private volatile boolean playing;
     private Thread gameThread;
+    private long timeThisFrame;
+    private float fps;
 
     public GameView(Context context) {
         super(context);
     }
 
     @Override
-    public void run() {
+    public void run()
+    {
+        while (playing)
+        {
+            long startFrameTime = System.currentTimeMillis();
+            update();
+            draw();
+            timeThisFrame = System.currentTimeMillis() - startFrameTime;
+            if (timeThisFrame >= 1)
+            {
+                fps = 1000 / timeThisFrame;
+            }
+        }
+    }
+
+    private void update()
+    {
+
+    }
+
+    private void draw()
+    {
+
     }
 
     public void resume()
