@@ -1,7 +1,10 @@
 package tees.ac.uk.mgd.w9090951.example.androidgame;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.util.Log;
+import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
 public class GameView extends SurfaceView implements Runnable {
@@ -10,9 +13,17 @@ public class GameView extends SurfaceView implements Runnable {
     private Thread gameThread;
     private long timeThisFrame;
     private float fps;
+    private SurfaceHolder surfaceHolder;
+    private Bitmap bitmap;
+    private int frameW;
+    private int frameH;
+    private int frameCount;
 
     public GameView(Context context) {
         super(context);
+        surfaceHolder = getHolder();
+        bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.circle);
+        bitmap = Bitmap.createScaledBitmap(bitmap,frameW * frameCount,frameH,false);
     }
 
     @Override
