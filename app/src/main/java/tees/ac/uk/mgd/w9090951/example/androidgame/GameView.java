@@ -13,7 +13,7 @@ import android.view.SurfaceView;
 
 public class GameView extends SurfaceView implements Runnable {
 
-    private volatile boolean playing;
+    private volatile boolean playing = true;
     private Thread gameThread;
     private long timeThisFrame;
     private float fps;
@@ -24,9 +24,9 @@ public class GameView extends SurfaceView implements Runnable {
     private int frameCount = 1;
     private int currentFrame = 0;
     private boolean isMoving;
-    private float xPos = 800;
-    private float yPos = 800;
-    private float velocity;
+    private float xPos;
+    private float yPos;
+    private float velocity = 10;
     private Rect frameToDraw = new Rect(0,0,frameW,frameH);
     private Rect whereToDraw = new Rect((int)xPos,(int)yPos, (int)xPos + frameW, frameH);
     private Canvas canvas;
@@ -121,6 +121,7 @@ public class GameView extends SurfaceView implements Runnable {
     {
         gameThread = new Thread(this);
         gameThread.start();
+        playing = true;
     }
 
     public void pause()
