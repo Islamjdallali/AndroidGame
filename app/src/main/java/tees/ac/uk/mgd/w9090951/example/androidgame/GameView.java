@@ -1,6 +1,9 @@
 package tees.ac.uk.mgd.w9090951.example.androidgame;
 
 import android.content.Context;
+import android.gesture.Gesture;
+import android.view.GestureDetector;
+import android.view.GestureDetector.SimpleOnGestureListener;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -10,6 +13,7 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.view.View;
 
 public class GameView extends SurfaceView implements Runnable {
 
@@ -32,9 +36,11 @@ public class GameView extends SurfaceView implements Runnable {
     private Canvas canvas;
     private float lastFrameChangeTime = 1;
     private float frameLengthInMs = 2;
+    OnSwipeTouchListener onSwipeTouchListener;
 
     public GameView(Context context) {
         super(context);
+        onSwipeTouchListener = new OnSwipeTouchListener(context);
         surfaceHolder = getHolder();
         bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.circle);
         bitmap = Bitmap.createScaledBitmap(bitmap,frameW * frameCount,frameH,false);
@@ -104,16 +110,16 @@ public class GameView extends SurfaceView implements Runnable {
     }
 
     @Override
-    public boolean onTouchEvent(MotionEvent event)
-    {
-        switch (event.getAction() & MotionEvent.ACTION_MASK)
-        {
-            case MotionEvent.ACTION_DOWN:
-                isMoving = !isMoving;
-                break;
-        }
-
-        return true;
+    public boolean onTouchEvent(MotionEvent event) {
+//        switch (event.getAction() & MotionEvent.ACTION_MASK) {
+//            case MotionEvent.ACTION_DOWN:
+//                Log.d("TAG", "onTouchEvent: Down");
+//                isMoving = !isMoving;
+//                break;
+//        }
+//
+//        return true;
+        return onSwipeTouchListener.onTouch(this, event);
     }
 
 
@@ -134,6 +140,59 @@ public class GameView extends SurfaceView implements Runnable {
         catch (InterruptedException e)
         {
             Log.e("GameView", "Interrupted");
+        }
+    }
+
+
+    public class OnSwipeTouchListener implements OnTouchListener
+    {
+        private final GestureDetector gestureDetector;
+
+        public OnSwipeTouchListener(Context ctx)
+        {
+            gestureDetector = new GestureDetector(ctx,new GestureListener());
+        }
+
+        @Override
+        public boolean onTouch(View view, MotionEvent motionEvent) {
+            Log.d("Gesture", "onTouch");
+            return gestureDetector.onTouchEvent(motionEvent);
+        }
+    }
+
+    private final class GestureListener extends  SimpleOnGestureListener
+    {
+        private static final int swipeThreshold = 100;
+        private static final int swipeVelocityThreshold = 100;
+
+
+        @Override
+        public boolean onDown(MotionEvent e) {
+            return true;
+        }
+
+        @Override
+        public boolean onFling(MotionEvent e1, MotionEvent e2,float velocityX, float velocityY)
+        {
+            boolean result = false;
+            Log.d("Gesture", "onFling");
+            try {
+                float diffX = e2.getX() - e1.getX();
+                if (Math.abs(diffX) > swipeThreshold) {
+                    if (diffX > 0) {
+                        Log.d("Gesture","Swipe right");
+
+                    } else {
+
+                    }
+                }
+                result = true;
+            }
+            catch(Exception exception)
+            {
+                exception.printStackTrace();
+            }
+            return result;
         }
     }
 }

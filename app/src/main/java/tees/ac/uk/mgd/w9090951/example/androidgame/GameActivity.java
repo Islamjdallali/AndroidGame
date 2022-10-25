@@ -3,6 +3,9 @@ package tees.ac.uk.mgd.w9090951.example.androidgame;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
+import android.util.Log;
+import android.view.MotionEvent;
+import android.view.View;
 
 public class GameActivity extends AppCompatActivity {
 
