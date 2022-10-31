@@ -2,6 +2,7 @@ package tees.ac.uk.mgd.w9090951.example.androidgame;
 
 import android.content.Context;
 import android.gesture.Gesture;
+import android.util.DisplayMetrics;
 import android.view.GestureDetector;
 import android.view.GestureDetector.SimpleOnGestureListener;
 import android.graphics.Bitmap;
@@ -23,26 +24,31 @@ public class GameView extends SurfaceView implements Runnable {
     private float fps;
     private SurfaceHolder surfaceHolder;
     private Bitmap bitmap;
-    private int frameW = 800;
-    private int frameH = 800;
+    private int frameW = 50;
+    private int frameH = 50;
     private int frameCount = 1;
     private int currentFrame = 0;
     private boolean isMoving;
     private float xPos;
     private float yPos;
-    private float velocity = 10;
+    private float velocity = 100;
+    private float dashLength = 100;
     private Rect frameToDraw = new Rect(0,0,frameW,frameH);
     private Rect whereToDraw = new Rect((int)xPos,(int)yPos, (int)xPos + frameW, frameH);
     private Canvas canvas;
     private float lastFrameChangeTime = 1;
     private float frameLengthInMs = 2;
     OnSwipeTouchListener onSwipeTouchListener;
+    DisplayMetrics displayMetrics;
 
     public GameView(Context context) {
         super(context);
         onSwipeTouchListener = new OnSwipeTouchListener(context);
+        displayMetrics = new DisplayMetrics();
+        xPos = context.getResources().getDisplayMetrics().widthPixels / 2;
+        yPos = context.getResources().getDisplayMetrics().heightPixels / 2;
         surfaceHolder = getHolder();
-        bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.circle);
+        bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.player);
         bitmap = Bitmap.createScaledBitmap(bitmap,frameW * frameCount,frameH,false);
     }
 
@@ -77,7 +83,9 @@ public class GameView extends SurfaceView implements Runnable {
                 yPos = 800;
             }
         }
+
     }
+
 
     private void draw()
     {
@@ -180,10 +188,11 @@ public class GameView extends SurfaceView implements Runnable {
                 float diffX = e2.getX() - e1.getX();
                 if (Math.abs(diffX) > swipeThreshold) {
                     if (diffX > 0) {
-                        Log.d("Gesture","Swipe right");
+                       xPos += dashLength;
 
-                    } else {
-
+                    } else
+                    {
+                        xPos -= dashLength;
                     }
                 }
                 result = true;
