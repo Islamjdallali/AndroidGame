@@ -1,7 +1,6 @@
 package tees.ac.uk.mgd.w9090951.example.androidgame;
 
 import android.content.Context;
-import android.gesture.Gesture;
 import android.util.DisplayMetrics;
 import android.view.GestureDetector;
 import android.view.GestureDetector.SimpleOnGestureListener;
@@ -16,6 +15,8 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 
+import java.util.Random;
+
 public class GameView extends SurfaceView implements Runnable {
 
     private volatile boolean playing = true;
@@ -29,6 +30,11 @@ public class GameView extends SurfaceView implements Runnable {
     private int frameCount = 1;
     private int currentFrame = 0;
     private boolean isMoving;
+    private int spawnXMinPos = 0;
+    private int spawnXMaxPos = 200;
+    private int spawnTimerMax = 10;
+    private int spawnTimerMin = 5;
+    private float spawnTimer;
     private float xPos;
     private float yPos;
     private float velocity = 100;
@@ -45,6 +51,8 @@ public class GameView extends SurfaceView implements Runnable {
         super(context);
         onSwipeTouchListener = new OnSwipeTouchListener(context);
         displayMetrics = new DisplayMetrics();
+        spawnTimer = new Random().nextInt((spawnTimerMax - spawnTimerMin) + 1) + spawnTimerMin;
+        Log.d("Spawner : ", String.valueOf(spawnTimer));
         xPos = context.getResources().getDisplayMetrics().widthPixels / 2;
         yPos = context.getResources().getDisplayMetrics().heightPixels / 2;
         surfaceHolder = getHolder();
@@ -70,6 +78,16 @@ public class GameView extends SurfaceView implements Runnable {
 
     private void update()
     {
+        spawnTimer -= 1 / fps;
+
+        Log.d("Timer : ", String.valueOf(spawnTimer));
+
+        if (spawnTimer <= 0)
+        {
+            Log.d("Spawner : ","Spawn now");
+            spawnTimer = new Random().nextInt((spawnTimerMax - spawnTimerMin) + 1) + spawnTimerMin;
+        }
+
         if (isMoving)
         {
             xPos = xPos + velocity / fps;
