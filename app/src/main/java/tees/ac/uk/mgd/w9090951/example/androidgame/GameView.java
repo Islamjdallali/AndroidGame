@@ -85,6 +85,7 @@ public class GameView extends SurfaceView implements Runnable {
         if (spawnTimer <= 0)
         {
             Log.d("Spawner : ","Spawn now");
+            Fire fire = new Fire(new Random().nextInt((spawnXMaxPos - spawnXMinPos) + 1) + spawnXMinPos,0);
             spawnTimer = new Random().nextInt((spawnTimerMax - spawnTimerMin) + 1) + spawnTimerMin;
         }
 
