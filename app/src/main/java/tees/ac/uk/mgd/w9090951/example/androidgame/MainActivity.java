@@ -19,4 +19,10 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(this,GameActivity.class);
         startActivity(intent);
     }
+
+    public void QuitGame(View view)
+    {
+        finish();
+        System.exit(0);
+    }
 }
