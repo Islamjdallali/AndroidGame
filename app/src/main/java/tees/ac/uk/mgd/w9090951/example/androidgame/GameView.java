@@ -15,6 +15,7 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 
+import java.util.List;
 import java.util.Random;
 
 public class GameView extends SurfaceView implements Runnable {
@@ -37,6 +38,7 @@ public class GameView extends SurfaceView implements Runnable {
     private float spawnTimer;
     private float xPos;
     private float yPos;
+    private List<Fire> fireList;
     private float velocity = 100;
     private float dashLength = 100;
     private Rect frameToDraw = new Rect(0,0,frameW,frameH);
@@ -85,7 +87,7 @@ public class GameView extends SurfaceView implements Runnable {
         if (spawnTimer <= 0)
         {
             Log.d("Spawner : ","Spawn now");
-            Fire fire = new Fire(new Random().nextInt((spawnXMaxPos - spawnXMinPos) + 1) + spawnXMinPos,0);
+            fireList.add(new Fire(new Random().nextInt((spawnXMaxPos - spawnXMinPos) + 1) + spawnXMinPos,0));
             spawnTimer = new Random().nextInt((spawnTimerMax - spawnTimerMin) + 1) + spawnTimerMin;
         }
 
