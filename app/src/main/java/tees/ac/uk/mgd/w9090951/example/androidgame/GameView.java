@@ -15,6 +15,7 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -25,7 +26,8 @@ public class GameView extends SurfaceView implements Runnable {
     private long timeThisFrame;
     private float fps;
     private SurfaceHolder surfaceHolder;
-    private Bitmap bitmap;
+    private Bitmap playerBitmap;
+    private Bitmap fireBitmap;
     private int frameW = 50;
     private int frameH = 50;
     private int frameCount = 1;
@@ -38,7 +40,7 @@ public class GameView extends SurfaceView implements Runnable {
     private float spawnTimer;
     private float xPos;
     private float yPos;
-    private List<Fire> fireList;
+    private List<Fire> fireList = new ArrayList<Fire>();
     private float velocity = 100;
     private float dashLength = 100;
     private Rect frameToDraw = new Rect(0,0,frameW,frameH);
@@ -58,8 +60,10 @@ public class GameView extends SurfaceView implements Runnable {
         xPos = context.getResources().getDisplayMetrics().widthPixels / 2;
         yPos = context.getResources().getDisplayMetrics().heightPixels / 2;
         surfaceHolder = getHolder();
-        bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.player);
-        bitmap = Bitmap.createScaledBitmap(bitmap,frameW * frameCount,frameH,false);
+        playerBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.player);
+        playerBitmap = Bitmap.createScaledBitmap(playerBitmap,frameW * frameCount,frameH,false);
+        fireBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.fire);
+        fireBitmap = Bitmap.createScaledBitmap(playerBitmap,frameW * frameCount,frameH,false);
     }
 
     @Override
@@ -87,8 +91,14 @@ public class GameView extends SurfaceView implements Runnable {
         if (spawnTimer <= 0)
         {
             Log.d("Spawner : ","Spawn now");
+
             fireList.add(new Fire(new Random().nextInt((spawnXMaxPos - spawnXMinPos) + 1) + spawnXMinPos,0));
             spawnTimer = new Random().nextInt((spawnTimerMax - spawnTimerMin) + 1) + spawnTimerMin;
+        }
+
+        for (int i = 0; i < fireList.size(); i++)
+        {
+            fireList.get(i).Move(fps);
         }
 
         if (isMoving)
@@ -115,8 +125,13 @@ public class GameView extends SurfaceView implements Runnable {
             canvas = surfaceHolder.lockCanvas();
             canvas.drawColor(Color.WHITE);
             whereToDraw.set((int)xPos,(int)yPos,(int)xPos + frameW, (int) yPos + frameH);
+            for (int i = 0; i < fireList.size(); i++)
+            {
+                whereToDraw.set((int)fireList.get(i).getPosX(), (int)fireList.get(i).getPosY(),(int)fireList.get(i).getPosX() + frameW, (int)fireList.get(i).getPosY() + frameH);
+                canvas.drawBitmap(fireBitmap,frameToDraw,whereToDraw,null);
+            }
             manageFrame();
-            canvas.drawBitmap(bitmap,frameToDraw,whereToDraw,null);
+            canvas.drawBitmap(playerBitmap,frameToDraw,whereToDraw,null);
             surfaceHolder.unlockCanvasAndPost(canvas);
         }
     }
