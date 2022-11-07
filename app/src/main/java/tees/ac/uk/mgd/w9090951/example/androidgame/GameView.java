@@ -45,6 +45,7 @@ public class GameView extends SurfaceView implements Runnable {
     private float dashLength = 100;
     private Rect frameToDraw = new Rect(0,0,frameW,frameH);
     private Rect whereToDraw = new Rect((int)xPos,(int)yPos, (int)xPos + frameW, frameH);
+    private Rect whereToDrawFire = new Rect((int)xPos,(int)yPos, (int)xPos + frameW, frameH);
     private Canvas canvas;
     private float lastFrameChangeTime = 1;
     private float frameLengthInMs = 2;
@@ -63,7 +64,7 @@ public class GameView extends SurfaceView implements Runnable {
         playerBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.player);
         playerBitmap = Bitmap.createScaledBitmap(playerBitmap,frameW * frameCount,frameH,false);
         fireBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.fire);
-        fireBitmap = Bitmap.createScaledBitmap(playerBitmap,frameW * frameCount,frameH,false);
+        fireBitmap = Bitmap.createScaledBitmap(fireBitmap,frameW * frameCount,frameH,false);
     }
 
     @Override
@@ -127,8 +128,8 @@ public class GameView extends SurfaceView implements Runnable {
             whereToDraw.set((int)xPos,(int)yPos,(int)xPos + frameW, (int) yPos + frameH);
             for (int i = 0; i < fireList.size(); i++)
             {
-                whereToDraw.set((int)fireList.get(i).getPosX(), (int)fireList.get(i).getPosY(),(int)fireList.get(i).getPosX() + frameW, (int)fireList.get(i).getPosY() + frameH);
-                canvas.drawBitmap(fireBitmap,frameToDraw,whereToDraw,null);
+                whereToDrawFire.set((int)fireList.get(i).getPosX(), (int)fireList.get(i).getPosY(),(int)fireList.get(i).getPosX() + frameW, (int)fireList.get(i).getPosY() + frameH);
+                canvas.drawBitmap(fireBitmap,frameToDraw,whereToDrawFire,null);
             }
             manageFrame();
             canvas.drawBitmap(playerBitmap,frameToDraw,whereToDraw,null);
