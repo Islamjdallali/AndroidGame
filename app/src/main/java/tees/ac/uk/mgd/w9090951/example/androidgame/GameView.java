@@ -1,6 +1,12 @@
 package tees.ac.uk.mgd.w9090951.example.androidgame;
 
+import android.app.Activity;
 import android.content.Context;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorListener;
+import android.hardware.SensorManager;
 import android.util.DisplayMetrics;
 import android.view.GestureDetector;
 import android.view.GestureDetector.SimpleOnGestureListener;
@@ -50,13 +56,17 @@ public class GameView extends SurfaceView implements Runnable {
     private float lastFrameChangeTime = 1;
     private float frameLengthInMs = 2;
     OnSwipeTouchListener onSwipeTouchListener;
+    TileSensor tileSensor;
     DisplayMetrics displayMetrics;
+    private float[] r;
+    private float[] v;
 
     public GameView(Context context) {
         super(context);
         onSwipeTouchListener = new OnSwipeTouchListener(context);
         displayMetrics = new DisplayMetrics();
         spawnTimer = new Random().nextInt((spawnTimerMax - spawnTimerMin) + 1) + spawnTimerMin;
+        tileSensor = new TileSensor(context);
         Log.d("Spawner : ", String.valueOf(spawnTimer));
         xPos = context.getResources().getDisplayMetrics().widthPixels / 2;
         yPos = context.getResources().getDisplayMetrics().heightPixels / 2;
@@ -87,11 +97,11 @@ public class GameView extends SurfaceView implements Runnable {
     {
         spawnTimer -= 1 / fps;
 
-        Log.d("Timer : ", String.valueOf(spawnTimer));
+        //Log.d("Timer : ", String.valueOf(spawnTimer));
 
         if (spawnTimer <= 0)
         {
-            Log.d("Spawner : ","Spawn now");
+            //Log.d("Spawner : ","Spawn now");
 
             fireList.add(new Fire(new Random().nextInt((spawnXMaxPos - spawnXMinPos) + 1) + spawnXMinPos,0));
             spawnTimer = new Random().nextInt((spawnTimerMax - spawnTimerMin) + 1) + spawnTimerMin;
@@ -188,6 +198,121 @@ public class GameView extends SurfaceView implements Runnable {
         }
     }
 
+    public class TileSensor extends Activity implements SensorEventListener
+    {
+        SensorManager sensorManager;
+        private float[] accel;
+        private float[] mag;
+        private float[] rotationMatrix = new float[16];
+        private float[] orientation = new float[4];
+
+        TileSensor(Context ctx)
+        {
+            sensorManager = (SensorManager) ctx.getSystemService(Context.SENSOR_SERVICE);
+            registerListeners();
+        }
+
+        private float[] lowPass(float[] input, float[] output)
+        {
+            return output;
+        }
+
+        @Override
+        public void onSensorChanged(SensorEvent sensorEvent)
+        {
+            float xValue = sensorEvent.values[0];
+            float yValue = sensorEvent.values[1];
+            float zValue = sensorEvent.values[2];
+
+            if (sensorEvent.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD)
+            {
+                GetMag(sensorEvent);
+            }
+            else if (sensorEvent.sensor.getType() == Sensor.TYPE_ACCELEROMETER)
+            {
+                GetAccel(sensorEvent);
+            }
+
+            // multiply the rotation by 1 radian
+            // 57.2957795 degrees = 1 radian
+
+            float X = orientation[0] *  57.2957795f;
+            float Y = orientation[1] *  57.2957795f;
+            float Z = orientation[2] *  57.2957795f;
+
+            Log.d("Sensor Info", "rotation X : " + X);
+            Log.d("Sensor Info", "rotation Y : " + Y);
+            Log.d("Sensor Info", "rotation Z : " + Z);
+        }
+
+        private void GetMag(SensorEvent event)
+        {
+            if (mag == null) {
+                mag = new float[3];
+            }
+
+            System.arraycopy(event.values, 0, mag, 0, 3);
+
+            if (accel != null)
+            {
+                ComputeOrientation();
+            }
+        }
+
+        private void GetAccel(SensorEvent event)
+        {
+            if (accel == null) {
+                accel = new float[3];
+            }
+
+            System.arraycopy(event.values, 0, accel, 0, 3);
+        }
+
+        private void ComputeOrientation()
+        {
+            if (SensorManager.getRotationMatrix(rotationMatrix, null, mag, accel))
+            {
+                SensorManager.getOrientation(rotationMatrix, orientation);
+            }
+        }
+
+        @Override
+        public void onAccuracyChanged(Sensor sensor, int i)
+        {
+
+        }
+
+        private void unregisterListeners()
+        {
+            sensorManager.unregisterListener(this);
+        }
+
+        private void registerListeners()
+        {
+            sensorManager.registerListener(this, sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD), SensorManager.SENSOR_DELAY_GAME);
+            sensorManager.registerListener(this, sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_GAME);
+        }
+
+        @Override
+        public void onDestroy()
+        {
+            unregisterListeners();
+            super.onDestroy();
+        }
+
+        @Override
+        public void onPause() {
+            unregisterListeners();
+            super.onPause();
+        }
+
+        @Override
+        public void onResume() {
+            registerListeners();
+            super.onResume();
+        }
+
+    }
 
     public class OnSwipeTouchListener implements OnTouchListener
     {
