@@ -7,15 +7,17 @@ import android.view.SurfaceHolder;
 public class Player extends Entities
 {
 
-    public Player(Bitmap bm, int height, int width, float startPosX, float startPosY, SurfaceHolder holder)
+    public Player(Bitmap bm, int height, int width, int startPosX, int startPosY, SurfaceHolder holder)
     {
         super(bm, height, width, startPosX, startPosY, holder);
         Log.d("TAG", "Player Pos X : " + xPos);
     }
 
+    @Override
     public void Move(float velocity)
     {
         xPos += velocity;
+
     }
 
     public void Dash(float dashLength)

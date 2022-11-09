@@ -1,37 +1,23 @@
 package tees.ac.uk.mgd.w9090951.example.androidgame;
 
 import android.graphics.Bitmap;
-import android.graphics.Rect;
+import android.view.SurfaceHolder;
+import java.util.Random;
 
 
-public class Fire
+public class Fire extends Entities
 {
-    private float xPos;
-    private float yPos;
-    private float velocity = 50;
-    private int frameW = 50;
-    private int frameH = 50;
-    private int frameCount = 1;
-    private Rect whereToDraw = new Rect((int)xPos,(int)yPos, (int)xPos + frameW, frameH);
+    private float velocity = 200;
 
-    public Fire(float startPosX, float startPosY)
+    public Fire(Bitmap bm, int height, int width, int startPosX, int startPosY, SurfaceHolder holder)
     {
-        xPos = startPosX;
-        yPos = startPosY;
+        super(bm, height, width, startPosX, startPosY, holder);
+        xPos = new Random().nextInt(startPosX);
     }
 
+    @Override
     public void Move(float fps)
     {
         yPos += velocity / fps;
-    }
-
-    public float getPosX()
-    {
-        return xPos;
-    }
-
-    public float getPosY()
-    {
-        return yPos;
     }
 }

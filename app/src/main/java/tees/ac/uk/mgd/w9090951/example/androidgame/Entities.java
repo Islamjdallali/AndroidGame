@@ -7,7 +7,7 @@ import android.graphics.Color;
 import android.graphics.Rect;
 import android.view.SurfaceHolder;
 
-public class Entities
+public abstract class Entities
 {
     private Bitmap entityBitmap;
     private int frameW = 50;
@@ -21,9 +21,8 @@ public class Entities
     private float lastFrameChangeTime = 1;
     private float frameLengthInMs = 2;
     private SurfaceHolder surfaceHolder;
-    private Canvas canvas;
 
-    public Entities(Bitmap bm, int height, int width, float startPosX, float startPosY, SurfaceHolder holder)
+    public Entities(Bitmap bm, int height, int width, int startPosX, int startPosY, SurfaceHolder holder)
     {
         surfaceHolder = holder;
         entityBitmap = bm;
@@ -33,17 +32,21 @@ public class Entities
         yPos = startPosY;
     }
 
-    public void draw()
+    public void draw(Canvas canvas)
     {
         if (surfaceHolder.getSurface().isValid())
         {
-            canvas = surfaceHolder.lockCanvas();
             whereToDraw.set((int)xPos,(int)yPos,(int)xPos + frameW, (int) yPos + frameH);
             manageFrame();
             canvas.drawBitmap(entityBitmap,frameToDraw,whereToDraw,null);
-            surfaceHolder.unlockCanvasAndPost(canvas);
         }
     }
+
+    public void Move()
+    {
+
+    }
+
 
     private void manageFrame()
     {
@@ -61,4 +64,6 @@ public class Entities
         frameToDraw.left = currentFrame * frameW;
         frameToDraw.right = frameToDraw.left + frameW;
     }
+
+    public abstract void Move(float velocity);
 }
