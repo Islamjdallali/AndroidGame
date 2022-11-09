@@ -5,9 +5,7 @@ import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
-import android.hardware.SensorListener;
 import android.hardware.SensorManager;
-import android.util.DisplayMetrics;
 import android.view.GestureDetector;
 import android.view.GestureDetector.SimpleOnGestureListener;
 import android.graphics.Bitmap;
@@ -46,6 +44,7 @@ public class GameView extends SurfaceView implements Runnable {
     private float spawnTimer;
     private float xPos;
     private float yPos;
+    private float steerVelocity;
     private List<Fire> fireList = new ArrayList<Fire>();
     private float velocity = 100;
     private float dashLength = 100;
@@ -57,14 +56,10 @@ public class GameView extends SurfaceView implements Runnable {
     private float frameLengthInMs = 2;
     OnSwipeTouchListener onSwipeTouchListener;
     TileSensor tileSensor;
-    DisplayMetrics displayMetrics;
-    private float[] r;
-    private float[] v;
 
     public GameView(Context context) {
         super(context);
         onSwipeTouchListener = new OnSwipeTouchListener(context);
-        displayMetrics = new DisplayMetrics();
         spawnTimer = new Random().nextInt((spawnTimerMax - spawnTimerMin) + 1) + spawnTimerMin;
         tileSensor = new TileSensor(context);
         Log.d("Spawner : ", String.valueOf(spawnTimer));
@@ -112,9 +107,12 @@ public class GameView extends SurfaceView implements Runnable {
             fireList.get(i).Move(fps);
         }
 
+        xPos += steerVelocity;
+
         if (isMoving)
         {
             xPos = xPos + velocity / fps;
+
             if (xPos > getWidth())
             {
                 yPos += frameH;
@@ -220,10 +218,6 @@ public class GameView extends SurfaceView implements Runnable {
         @Override
         public void onSensorChanged(SensorEvent sensorEvent)
         {
-            float xValue = sensorEvent.values[0];
-            float yValue = sensorEvent.values[1];
-            float zValue = sensorEvent.values[2];
-
             if (sensorEvent.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD)
             {
                 GetMag(sensorEvent);
@@ -232,17 +226,12 @@ public class GameView extends SurfaceView implements Runnable {
             {
                 GetAccel(sensorEvent);
             }
-
             // multiply the rotation by 1 radian
             // 57.2957795 degrees = 1 radian
 
-            float X = orientation[0] *  57.2957795f;
             float Y = orientation[1] *  57.2957795f;
-            float Z = orientation[2] *  57.2957795f;
 
-            Log.d("Sensor Info", "rotation X : " + X);
-            Log.d("Sensor Info", "rotation Y : " + Y);
-            Log.d("Sensor Info", "rotation Z : " + Z);
+            steerVelocity = Y;
         }
 
         private void GetMag(SensorEvent event)
