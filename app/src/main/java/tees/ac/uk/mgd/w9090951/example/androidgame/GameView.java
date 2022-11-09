@@ -36,7 +36,6 @@ public class GameView extends SurfaceView implements Runnable {
     private int frameH = 50;
     private int frameCount = 1;
     private int currentFrame = 0;
-    private boolean isMoving;
     private int spawnXMinPos = 0;
     private int spawnXMaxPos = 200;
     private int spawnTimerMax = 10;
@@ -46,7 +45,7 @@ public class GameView extends SurfaceView implements Runnable {
     private float yPos;
     private float steerVelocity;
     private List<Fire> fireList = new ArrayList<Fire>();
-    private float velocity = 100;
+    private List<Entities> entityList = new ArrayList<Entities>();
     private float dashLength = 100;
     private Rect frameToDraw = new Rect(0,0,frameW,frameH);
     private Rect whereToDraw = new Rect((int)xPos,(int)yPos, (int)xPos + frameW, frameH);
@@ -70,6 +69,8 @@ public class GameView extends SurfaceView implements Runnable {
         playerBitmap = Bitmap.createScaledBitmap(playerBitmap,frameW * frameCount,frameH,false);
         fireBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.fire);
         fireBitmap = Bitmap.createScaledBitmap(fireBitmap,frameW * frameCount,frameH,false);
+
+        //Player player = new Player(playerBitmap,frameH,frameW,xPos,yPos,surfaceHolder);
     }
 
     @Override
@@ -92,11 +93,8 @@ public class GameView extends SurfaceView implements Runnable {
     {
         spawnTimer -= 1 / fps;
 
-        //Log.d("Timer : ", String.valueOf(spawnTimer));
-
         if (spawnTimer <= 0)
         {
-            //Log.d("Spawner : ","Spawn now");
 
             fireList.add(new Fire(new Random().nextInt((spawnXMaxPos - spawnXMinPos) + 1) + spawnXMinPos,0));
             spawnTimer = new Random().nextInt((spawnTimerMax - spawnTimerMin) + 1) + spawnTimerMin;
@@ -109,19 +107,14 @@ public class GameView extends SurfaceView implements Runnable {
 
         xPos += steerVelocity;
 
-        if (isMoving)
+        if (xPos > getWidth())
         {
-            xPos = xPos + velocity / fps;
-
-            if (xPos > getWidth())
-            {
-                yPos += frameH;
-                xPos = 800;
-            }
-            if (yPos + frameH > getHeight())
-            {
-                yPos = 800;
-            }
+            yPos += frameH;
+            xPos = 800;
+        }
+        if (yPos + frameH > getHeight())
+        {
+            yPos = 800;
         }
 
     }
@@ -163,15 +156,8 @@ public class GameView extends SurfaceView implements Runnable {
     }
 
     @Override
-    public boolean onTouchEvent(MotionEvent event) {
-//        switch (event.getAction() & MotionEvent.ACTION_MASK) {
-//            case MotionEvent.ACTION_DOWN:
-//                Log.d("TAG", "onTouchEvent: Down");
-//                isMoving = !isMoving;
-//                break;
-//        }
-//
-//        return true;
+    public boolean onTouchEvent(MotionEvent event)
+    {
         return onSwipeTouchListener.onTouch(this, event);
     }
 
