@@ -47,6 +47,10 @@ public abstract class Entities
 
     }
 
+    public boolean isCollision(float x2, float y2)
+    {
+        return x2 > xPos && x2 < xPos + frameW && y2 > yPos && y2 < yPos + frameH;
+    }
 
     private void manageFrame()
     {

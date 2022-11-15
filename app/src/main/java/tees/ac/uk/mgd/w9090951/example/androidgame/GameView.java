@@ -95,13 +95,16 @@ public class GameView extends SurfaceView implements Runnable {
         for (int i = 1; i < entityList.size(); i++)
         {
             entityList.get(i).Move(fps);
+            if (entityList.get(0).isCollision(entityList.get(i).xPos,entityList.get(i).yPos))
+            {
+                entityList.remove(i);
+            }
         }
 
         entityList.get(0).Move(steerVelocity);
         Log.d("Controls", "Velocity: " + steerVelocity);
 
     }
-
 
     private void draw()
     {
