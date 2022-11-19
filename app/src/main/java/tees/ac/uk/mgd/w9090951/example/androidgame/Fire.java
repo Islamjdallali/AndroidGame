@@ -7,7 +7,7 @@ import java.util.Random;
 
 public class Fire extends Entities
 {
-    private float velocity = 200;
+    private float velocity = 500;
 
     public Fire(Bitmap bm, int height, int width, int startPosX, int startPosY, SurfaceHolder holder)
     {

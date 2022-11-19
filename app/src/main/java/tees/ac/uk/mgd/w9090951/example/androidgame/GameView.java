@@ -2,6 +2,7 @@ package tees.ac.uk.mgd.w9090951.example.androidgame;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Paint;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -12,7 +13,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Rect;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
@@ -42,10 +42,13 @@ public class GameView extends SurfaceView implements Runnable {
     private int height;
     private float steerVelocity;
     private List<Entities> entityList = new ArrayList<Entities>();
-    private float dashLength = 100;
+    private float dashLength = 500;
     private Canvas canvas;
     OnSwipeTouchListener onSwipeTouchListener;
     TileSensor tileSensor;
+
+    private float score;
+    private Paint scorePaint;
 
     public GameView(Context context) {
         super(context);
@@ -61,6 +64,12 @@ public class GameView extends SurfaceView implements Runnable {
         fireBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.fire);
         fireBitmap = Bitmap.createScaledBitmap(fireBitmap,frameW * frameCount,frameH,false);
 
+        scorePaint = new Paint();
+        scorePaint.setColor(Color.BLACK);
+        scorePaint.setTextSize(50);
+
+        score = 0;
+
         Player player = new Player(playerBitmap,frameH,frameW,width / 2,height / 2,surfaceHolder);
         entityList.add(player);
     }
@@ -71,8 +80,8 @@ public class GameView extends SurfaceView implements Runnable {
         while (playing)
         {
             long startFrameTime = System.currentTimeMillis();
-            update();
             draw();
+            update();
             timeThisFrame = System.currentTimeMillis() - startFrameTime;
             if (timeThisFrame >= 1)
             {
@@ -102,7 +111,6 @@ public class GameView extends SurfaceView implements Runnable {
         }
 
         entityList.get(0).Move(steerVelocity);
-        Log.d("Controls", "Velocity: " + steerVelocity);
 
     }
 
@@ -116,6 +124,8 @@ public class GameView extends SurfaceView implements Runnable {
             {
                 entityList.get(i).draw(canvas);
             }
+            score = score + 0.1f;
+            canvas.drawText("Score : " + (int)score,width / 2,50,scorePaint);
             surfaceHolder.unlockCanvasAndPost(canvas);
         }
     }
