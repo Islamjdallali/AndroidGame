@@ -7,9 +7,9 @@ import android.view.SurfaceHolder;
 public class Player extends Entities
 {
 
-    public Player(Bitmap bm, int height, int width, int startPosX, int startPosY, SurfaceHolder holder)
+    public Player(Bitmap bm, int height, int width, int startPosX, int startPosY, SurfaceHolder holder,boolean startIsAlive)
     {
-        super(bm, height, width, startPosX, startPosY, holder);
+        super(bm, height, width, startPosX, startPosY, holder,startIsAlive);
         Log.d("TAG", "Player Pos X : " + xPos);
     }
 

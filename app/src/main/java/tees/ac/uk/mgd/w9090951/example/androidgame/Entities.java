@@ -21,8 +21,9 @@ public abstract class Entities
     private float lastFrameChangeTime = 1;
     private float frameLengthInMs = 2;
     private SurfaceHolder surfaceHolder;
+    protected boolean isAlive;
 
-    public Entities(Bitmap bm, int height, int width, int startPosX, int startPosY, SurfaceHolder holder)
+    public Entities(Bitmap bm, int height, int width, int startPosX, int startPosY, SurfaceHolder holder, boolean startIsAlive)
     {
         surfaceHolder = holder;
         entityBitmap = bm;
@@ -30,21 +31,41 @@ public abstract class Entities
         frameH = height;
         xPos = startPosX;
         yPos = startPosY;
+        isAlive = startIsAlive;
     }
 
     public void draw(Canvas canvas)
     {
-        if (surfaceHolder.getSurface().isValid())
+        if (isAlive)
         {
-            whereToDraw.set((int)xPos,(int)yPos,(int)xPos + frameW, (int) yPos + frameH);
-            manageFrame();
-            canvas.drawBitmap(entityBitmap,frameToDraw,whereToDraw,null);
+            if (surfaceHolder.getSurface().isValid())
+            {
+                whereToDraw.set((int)xPos,(int)yPos,(int)xPos + frameW, (int) yPos + frameH);
+                manageFrame();
+                canvas.drawBitmap(entityBitmap,frameToDraw,whereToDraw,null);
+            }
         }
     }
 
-    public void Move()
+    public void SetAlive(boolean isDead)
     {
+        isAlive = isDead;
+    }
 
+    public boolean GetIsAlive()
+    {
+        return isAlive;
+    }
+
+    public void SetPos(float x, float y)
+    {
+        xPos = x;
+        yPos = y;
+    }
+
+    public float GetYPos()
+    {
+        return yPos;
     }
 
     public boolean isCollision(float x2, float y2)

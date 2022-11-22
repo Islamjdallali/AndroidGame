@@ -38,8 +38,8 @@ public class GameView extends SurfaceView implements Runnable {
     private int spawnTimerMax = 5;
     private int spawnTimerMin = 1;
     private float spawnTimer;
-    private int width;
-    private int height;
+    private int screenWidth;
+    private int screenHeight;
     private float steerVelocity;
     private List<Entities> entityList = new ArrayList<Entities>();
     private float dashLength = 500;
@@ -50,14 +50,16 @@ public class GameView extends SurfaceView implements Runnable {
     private float score;
     private Paint scorePaint;
 
+    private int maxFireCount = 50;
+
     public GameView(Context context) {
         super(context);
         onSwipeTouchListener = new OnSwipeTouchListener(context);
         spawnTimer = new Random().nextInt((spawnTimerMax - spawnTimerMin) + 1) + spawnTimerMin;
         tileSensor = new TileSensor(context);
         Log.d("Spawner : ", String.valueOf(spawnTimer));
-        width = context.getResources().getDisplayMetrics().widthPixels;
-        height = context.getResources().getDisplayMetrics().heightPixels;
+        screenWidth = context.getResources().getDisplayMetrics().widthPixels;
+        screenHeight = context.getResources().getDisplayMetrics().heightPixels;
         surfaceHolder = getHolder();
         playerBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.player);
         playerBitmap = Bitmap.createScaledBitmap(playerBitmap,frameW * frameCount,frameH,false);
@@ -70,8 +72,13 @@ public class GameView extends SurfaceView implements Runnable {
 
         score = 0;
 
-        Player player = new Player(playerBitmap,frameH,frameW,width / 2,height / 2,surfaceHolder);
+        Player player = new Player(playerBitmap,frameH,frameW, screenWidth / 2, screenHeight / 2,surfaceHolder,true);
         entityList.add(player);
+
+        for(int i = 0; i < maxFireCount; i++)
+        {
+            entityList.add(new Fire(fireBitmap,frameH,frameW, screenWidth,0,surfaceHolder,false));
+        }
     }
 
     @Override
@@ -97,16 +104,37 @@ public class GameView extends SurfaceView implements Runnable {
         if (spawnTimer <= 0)
         {
 
-            entityList.add(new Fire(fireBitmap,frameH,frameW,width,0,surfaceHolder));
+            for(int i = 1; i < entityList.size(); i++)
+            {
+                if (!entityList.get(i).GetIsAlive())
+                {
+                    entityList.get(i).SetAlive(true);
+                    break;
+                }
+            }
+
             spawnTimer = new Random().nextInt((spawnTimerMax - spawnTimerMin) + 1) + spawnTimerMin;
         }
 
         for (int i = 1; i < entityList.size(); i++)
         {
-            entityList.get(i).Move(fps);
-            if (entityList.get(0).isCollision(entityList.get(i).xPos,entityList.get(i).yPos))
+            if (entityList.get(i).GetIsAlive())
             {
-                entityList.remove(i);
+                entityList.get(i).Move(fps);
+
+                if (entityList.get(0).isCollision(entityList.get(i).xPos,entityList.get(i).yPos))
+                {
+                    entityList.remove(i);
+                }
+            }
+            else
+            {
+                entityList.get(i).SetPos(new Random().nextInt(screenWidth),0);
+            }
+
+            if (entityList.get(i).GetYPos() > screenHeight)
+            {
+                entityList.get(i).SetAlive(false);
             }
         }
 
@@ -125,7 +153,7 @@ public class GameView extends SurfaceView implements Runnable {
                 entityList.get(i).draw(canvas);
             }
             score = score + 0.1f;
-            canvas.drawText("Score : " + (int)score,width / 2,50,scorePaint);
+            canvas.drawText("Score : " + (int)score, screenWidth / 2,50,scorePaint);
             surfaceHolder.unlockCanvasAndPost(canvas);
         }
     }
