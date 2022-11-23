@@ -3,6 +3,7 @@ package tees.ac.uk.mgd.w9090951.example.androidgame;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Paint;
+import android.graphics.Rect;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -52,6 +53,9 @@ public class GameView extends SurfaceView implements Runnable {
 
     private int maxFireCount = 50;
 
+    private Rect restartButton;
+    private Bitmap restartBitmap;
+
     public GameView(Context context) {
         super(context);
         onSwipeTouchListener = new OnSwipeTouchListener(context);
@@ -65,6 +69,9 @@ public class GameView extends SurfaceView implements Runnable {
         playerBitmap = Bitmap.createScaledBitmap(playerBitmap,frameW * frameCount,frameH,false);
         fireBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.fire);
         fireBitmap = Bitmap.createScaledBitmap(fireBitmap,frameW * frameCount,frameH,false);
+        restartBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.restart);
+        restartBitmap = Bitmap.createScaledBitmap(restartBitmap,200,100,false);
+        restartButton = new Rect((screenWidth / 2) - 100,screenHeight / 2,(screenWidth / 2) + 100,(screenHeight / 2) + 100);
 
         scorePaint = new Paint();
         scorePaint.setColor(Color.BLACK);
@@ -124,7 +131,8 @@ public class GameView extends SurfaceView implements Runnable {
 
                 if (entityList.get(0).isCollision(entityList.get(i).xPos,entityList.get(i).yPos))
                 {
-                    entityList.remove(i);
+                    entityList.get(i).SetAlive(false);
+                    entityList.get(0).SetAlive(false);
                 }
             }
             else
@@ -148,11 +156,18 @@ public class GameView extends SurfaceView implements Runnable {
         {
             canvas = surfaceHolder.lockCanvas();
             canvas.drawColor(Color.WHITE);
+            if (!entityList.get(0).isAlive)
+            {
+                canvas.drawBitmap(restartBitmap,null, restartButton,null);
+            }
+            else
+            {
+                score = score + 0.1f;
+            }
             for (int i = 0; i < entityList.size(); i++)
             {
                 entityList.get(i).draw(canvas);
             }
-            score = score + 0.1f;
             canvas.drawText("Score : " + (int)score, screenWidth / 2,50,scorePaint);
             surfaceHolder.unlockCanvasAndPost(canvas);
         }
@@ -162,6 +177,15 @@ public class GameView extends SurfaceView implements Runnable {
     @Override
     public boolean onTouchEvent(MotionEvent event)
     {
+        if (restartButton.contains((int)event.getX(), (int)event.getY()))
+        {
+            for (int i = 0; i < entityList.size(); i++)
+            {
+                entityList.get(i).Restart();
+                score = 0;
+            }
+        }
+
         return onSwipeTouchListener.onTouch(this, event);
     }
 

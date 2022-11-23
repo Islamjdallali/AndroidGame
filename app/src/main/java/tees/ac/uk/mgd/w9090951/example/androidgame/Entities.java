@@ -16,6 +16,8 @@ public abstract class Entities
     private int currentFrame = 0;
     protected float xPos;
     protected float yPos;
+    protected float startXPos;
+    protected float startYPos;
     private Rect frameToDraw = new Rect(0,0,frameW,frameH);
     private Rect whereToDraw = new Rect((int)xPos,(int)yPos, (int)xPos + frameW, frameH);
     private float lastFrameChangeTime = 1;
@@ -29,6 +31,8 @@ public abstract class Entities
         entityBitmap = bm;
         frameW = width;
         frameH = height;
+        startXPos = startPosX;
+        startYPos = startPosY;
         xPos = startPosX;
         yPos = startPosY;
         isAlive = startIsAlive;
@@ -55,6 +59,13 @@ public abstract class Entities
     public boolean GetIsAlive()
     {
         return isAlive;
+    }
+
+    public void Restart()
+    {
+        xPos = startXPos;
+        yPos = startYPos;
+        isAlive = true;
     }
 
     public void SetPos(float x, float y)
