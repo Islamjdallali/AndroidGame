@@ -1,6 +1,7 @@
 package tees.ac.uk.mgd.w9090951.example.androidgame;
 
 import android.app.Activity;
+import android.view.View;
 import android.content.Context;
 import android.graphics.Paint;
 import android.graphics.Rect;
@@ -18,7 +19,6 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
-import android.view.View;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,6 +45,7 @@ public class GameView extends SurfaceView implements Runnable {
     private List<Entities> entityList = new ArrayList<Entities>();
     private float dashLength = 500;
     private Canvas canvas;
+    private Activity activity;
     OnSwipeTouchListener onSwipeTouchListener;
     TileSensor tileSensor;
 
@@ -56,7 +57,10 @@ public class GameView extends SurfaceView implements Runnable {
     private Rect restartButton;
     private Bitmap restartBitmap;
 
-    public GameView(Context context) {
+    private Rect quitButton;
+    private Bitmap quitBitmap;
+
+    public GameView(Context context, Activity act) {
         super(context);
         onSwipeTouchListener = new OnSwipeTouchListener(context);
         spawnTimer = new Random().nextInt((spawnTimerMax - spawnTimerMin) + 1) + spawnTimerMin;
@@ -69,13 +73,20 @@ public class GameView extends SurfaceView implements Runnable {
         playerBitmap = Bitmap.createScaledBitmap(playerBitmap,frameW * frameCount,frameH,false);
         fireBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.fire);
         fireBitmap = Bitmap.createScaledBitmap(fireBitmap,frameW * frameCount,frameH,false);
+
         restartBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.restart);
         restartBitmap = Bitmap.createScaledBitmap(restartBitmap,200,100,false);
-        restartButton = new Rect((screenWidth / 2) - 100,screenHeight / 2,(screenWidth / 2) + 100,(screenHeight / 2) + 100);
+        restartButton = new Rect((screenWidth / 2) - 100,screenHeight / 2 - 100,(screenWidth / 2) + 100,(screenHeight / 2));
+
+        quitBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.quit);
+        quitBitmap = Bitmap.createScaledBitmap(quitBitmap,200,100,false);
+        quitButton = new Rect((screenWidth / 2) - 100,(screenHeight / 2) + 100,(screenWidth / 2) + 100,(screenHeight / 2) + 200);
 
         scorePaint = new Paint();
         scorePaint.setColor(Color.BLACK);
         scorePaint.setTextSize(50);
+
+        activity = act;
 
         score = 0;
 
@@ -159,6 +170,7 @@ public class GameView extends SurfaceView implements Runnable {
             if (!entityList.get(0).isAlive)
             {
                 canvas.drawBitmap(restartBitmap,null, restartButton,null);
+                canvas.drawBitmap(quitBitmap,null, quitButton,null);
             }
             else
             {
@@ -184,6 +196,11 @@ public class GameView extends SurfaceView implements Runnable {
                 entityList.get(i).Restart();
                 score = 0;
             }
+        }
+
+        if (quitButton.contains((int)event.getX(), (int)event.getY()))
+        {
+            activity.finish();
         }
 
         return onSwipeTouchListener.onTouch(this, event);
