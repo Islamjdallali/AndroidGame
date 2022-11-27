@@ -261,8 +261,9 @@ public class GameView extends SurfaceView implements Runnable {
             // 57.2957795 degrees = 1 radian
 
             float Y = orientation[1] *  57.2957795f;
+            Log.d("Orientation", "onSensorChanged: " + Y);
 
-            steerVelocity = Y;
+            steerVelocity = -Y;
         }
 
         private void GetMag(SensorEvent event)
@@ -290,7 +291,7 @@ public class GameView extends SurfaceView implements Runnable {
 
         private void ComputeOrientation()
         {
-            if (SensorManager.getRotationMatrix(rotationMatrix, null, mag, accel))
+            if (SensorManager.getRotationMatrix(rotationMatrix, null, accel, mag))
             {
                 SensorManager.getOrientation(rotationMatrix, orientation);
             }
