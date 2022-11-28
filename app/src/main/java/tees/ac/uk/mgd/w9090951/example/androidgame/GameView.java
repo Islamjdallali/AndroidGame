@@ -1,6 +1,7 @@
 package tees.ac.uk.mgd.w9090951.example.androidgame;
 
 import android.app.Activity;
+import android.content.SharedPreferences;
 import android.view.View;
 import android.content.Context;
 import android.graphics.Paint;
@@ -50,6 +51,7 @@ public class GameView extends SurfaceView implements Runnable {
     TileSensor tileSensor;
 
     private float score;
+    private float highScore;
     private Paint scorePaint;
 
     private int maxFireCount = 50;
@@ -87,6 +89,9 @@ public class GameView extends SurfaceView implements Runnable {
         scorePaint.setTextSize(50);
 
         activity = act;
+
+        SharedPreferences settings = context.getSharedPreferences("ScorePrefs",0);
+        highScore = settings.getFloat("HighScore",0);
 
         score = 0;
 
@@ -169,16 +174,31 @@ public class GameView extends SurfaceView implements Runnable {
             canvas.drawColor(Color.WHITE);
             if (!entityList.get(0).isAlive)
             {
+                SharedPreferences settings = activity.getApplicationContext().getSharedPreferences("ScorePrefs",0);
+                float currentHighScore = settings.getFloat("HighScore",0);
+                if (currentHighScore > highScore)
+                {
+                    highScore = currentHighScore;
+                }
+
+                canvas.drawText("Highscore : " + (int)highScore, screenWidth / 2,100,scorePaint);
+
                 canvas.drawBitmap(restartBitmap,null, restartButton,null);
                 canvas.drawBitmap(quitBitmap,null, quitButton,null);
             }
             else
             {
                 score = score + 0.1f;
+                SharedPreferences settings = activity.getApplicationContext().getSharedPreferences("ScorePrefs",0);
+                SharedPreferences.Editor editor = settings.edit();
+                editor.putFloat("HighScore",score);
+
+                editor.apply();
             }
             for (int i = 0; i < entityList.size(); i++)
             {
                 entityList.get(i).draw(canvas);
+
             }
             canvas.drawText("Score : " + (int)score, screenWidth / 2,50,scorePaint);
             surfaceHolder.unlockCanvasAndPost(canvas);
