@@ -190,9 +190,12 @@ public class GameView extends SurfaceView implements Runnable {
                 entityList.get(i).SetPos(new Random().nextInt(screenWidth),0);
             }
 
-            if (entityList.get(i).GetYPos() > screenHeight)
+            if (entityList.get(i).GetName() == "Fire")
             {
-                entityList.get(i).SetAlive(false);
+                if (entityList.get(i).GetYPos() > screenHeight)
+                {
+                    entityList.get(i).SetAlive(false);
+                }
             }
         }
 
