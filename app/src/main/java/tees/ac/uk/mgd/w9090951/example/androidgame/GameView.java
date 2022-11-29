@@ -148,13 +148,15 @@ public class GameView extends SurfaceView implements Runnable {
 
         if (spawnTimer <= 0)
         {
-
             for(int i = 1; i < entityList.size(); i++)
             {
-                if (!entityList.get(i).GetIsAlive())
+                if (entityList.get(i).GetName() == "Fire")
                 {
-                    entityList.get(i).SetAlive(true);
-                    break;
+                    if (!entityList.get(i).GetIsAlive())
+                    {
+                        entityList.get(i).SetAlive(true);
+                        break;
+                    }
                 }
             }
 

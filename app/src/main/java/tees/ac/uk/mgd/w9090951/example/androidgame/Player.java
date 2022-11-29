@@ -9,7 +9,6 @@ public class Player extends Entities
     public Player(String n,Bitmap bm, int height, int width, int startPosX, int startPosY, SurfaceHolder holder,boolean startIsAlive,boolean collide)
     {
         super(n,bm, height, width, startPosX, startPosY, holder,startIsAlive,collide);
-        Log.d("TAG", "Player Pos X : " + xPos);
     }
 
     @Override
@@ -23,7 +22,6 @@ public class Player extends Entities
     public void GetSteerInput(float steerVelocity)
     {
         velocity = steerVelocity;
-        Log.d("TEST", "called");
     }
 
     public void Dash(float dashLength)
