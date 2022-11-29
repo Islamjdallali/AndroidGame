@@ -6,18 +6,24 @@ import android.view.SurfaceHolder;
 
 public class Player extends Entities
 {
-
-    public Player(Bitmap bm, int height, int width, int startPosX, int startPosY, SurfaceHolder holder,boolean startIsAlive)
+    public Player(String n,Bitmap bm, int height, int width, int startPosX, int startPosY, SurfaceHolder holder,boolean startIsAlive,boolean collide)
     {
-        super(bm, height, width, startPosX, startPosY, holder,startIsAlive);
+        super(n,bm, height, width, startPosX, startPosY, holder,startIsAlive,collide);
         Log.d("TAG", "Player Pos X : " + xPos);
     }
 
     @Override
-    public void Move(float velocity)
+    public void Move(float fps)
     {
         xPos += velocity;
 
+    }
+
+    @Override
+    public void GetSteerInput(float steerVelocity)
+    {
+        velocity = steerVelocity;
+        Log.d("TEST", "called");
     }
 
     public void Dash(float dashLength)

@@ -10,23 +10,28 @@ import android.view.SurfaceHolder;
 public abstract class Entities
 {
     private Bitmap entityBitmap;
-    private int frameW = 50;
-    private int frameH = 50;
+    protected int frameW = 50;
+    protected int frameH = 50;
     private int frameCount = 1;
     private int currentFrame = 0;
     protected float xPos;
     protected float yPos;
     protected float startXPos;
     protected float startYPos;
+    protected float velocity;
     private Rect frameToDraw = new Rect(0,0,frameW,frameH);
     private Rect whereToDraw = new Rect((int)xPos,(int)yPos, (int)xPos + frameW, frameH);
     private float lastFrameChangeTime = 1;
     private float frameLengthInMs = 2;
     private SurfaceHolder surfaceHolder;
     protected boolean isAlive;
+    protected boolean canCollide;
 
-    public Entities(Bitmap bm, int height, int width, int startPosX, int startPosY, SurfaceHolder holder, boolean startIsAlive)
+    protected String entityName;
+
+    public Entities(String name,Bitmap bm, int height, int width, int startPosX, int startPosY, SurfaceHolder holder, boolean startIsAlive,boolean collide)
     {
+        entityName = name;
         surfaceHolder = holder;
         entityBitmap = bm;
         frameW = width;
@@ -36,6 +41,7 @@ public abstract class Entities
         xPos = startPosX;
         yPos = startPosY;
         isAlive = startIsAlive;
+        canCollide = collide;
     }
 
     public void draw(Canvas canvas)
@@ -74,6 +80,11 @@ public abstract class Entities
         yPos = y;
     }
 
+    public String GetName()
+    {
+        return entityName;
+    }
+
     public float GetYPos()
     {
         return yPos;
@@ -101,5 +112,6 @@ public abstract class Entities
         frameToDraw.right = frameToDraw.left + frameW;
     }
 
-    public abstract void Move(float velocity);
+    public abstract void Move(float fps);
+    public abstract void GetSteerInput(float velocity);
 }

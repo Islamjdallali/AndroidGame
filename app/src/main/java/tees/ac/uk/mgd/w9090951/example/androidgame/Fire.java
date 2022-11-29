@@ -8,14 +8,14 @@ import java.util.Random;
 
 public class Fire extends Entities
 {
-    private float velocity = 500;
     private int screenWidth;
 
-    public Fire(Bitmap bm, int height, int width, int startPosX, int startPosY, SurfaceHolder holder, boolean startIsAlive)
+    public Fire(String n,Bitmap bm, int height, int width, int startPosX, int startPosY, SurfaceHolder holder, boolean startIsAlive, boolean collide)
     {
-        super(bm, height, width, startPosX, startPosY, holder,startIsAlive);
+        super(n,bm, height, width, startPosX, startPosY, holder,startIsAlive,collide);
         screenWidth = startPosX;
         xPos = new Random().nextInt(screenWidth);
+        velocity = 500;
     }
 
     @Override
@@ -27,5 +27,10 @@ public class Fire extends Entities
         {
             yPos = 0;
         }
+    }
+
+    @Override
+    public void GetSteerInput(float velocity) {
+
     }
 }

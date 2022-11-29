@@ -27,6 +27,8 @@ import java.util.Random;
 
 public class GameView extends SurfaceView implements Runnable {
 
+    private String DEBUG_TAG = "Test";
+
     private volatile boolean playing = true;
     private Thread gameThread;
     private long timeThisFrame;
@@ -34,6 +36,7 @@ public class GameView extends SurfaceView implements Runnable {
     private SurfaceHolder surfaceHolder;
     private Bitmap playerBitmap;
     private Bitmap fireBitmap;
+    private Bitmap backgroundBitmap;
     private int frameW = 50;
     private int frameH = 50;
     private int frameCount = 1;
@@ -71,10 +74,14 @@ public class GameView extends SurfaceView implements Runnable {
         screenWidth = context.getResources().getDisplayMetrics().widthPixels;
         screenHeight = context.getResources().getDisplayMetrics().heightPixels;
         surfaceHolder = getHolder();
+        //Get all of the relevant bitmaps
         playerBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.player);
         playerBitmap = Bitmap.createScaledBitmap(playerBitmap,frameW * frameCount,frameH,false);
         fireBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.fire);
         fireBitmap = Bitmap.createScaledBitmap(fireBitmap,frameW * frameCount,frameH,false);
+
+        backgroundBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.background);
+        backgroundBitmap = Bitmap.createScaledBitmap(backgroundBitmap,2076,1080,false);
 
         restartBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.restart);
         restartBitmap = Bitmap.createScaledBitmap(restartBitmap,200,100,false);
@@ -84,24 +91,39 @@ public class GameView extends SurfaceView implements Runnable {
         quitBitmap = Bitmap.createScaledBitmap(quitBitmap,200,100,false);
         quitButton = new Rect((screenWidth / 2) - 100,(screenHeight / 2) + 100,(screenWidth / 2) + 100,(screenHeight / 2) + 200);
 
+        //Get textsize and color of the scoretext
         scorePaint = new Paint();
         scorePaint.setColor(Color.BLACK);
         scorePaint.setTextSize(50);
 
         activity = act;
 
+        //Set the highscore and set the score to 0
+
         SharedPreferences settings = context.getSharedPreferences("ScorePrefs",0);
         highScore = settings.getFloat("HighScore",0);
 
         score = 0;
 
-        Player player = new Player(playerBitmap,frameH,frameW, screenWidth / 2, screenHeight / 2,surfaceHolder,true);
+        //Add Player,Fire and the background into the entity list
+
+        Background bg1 = new Background("BG1",backgroundBitmap,1080,2076, 0, 0,surfaceHolder,true,false);
+        Background bg2 = new Background("BG2",backgroundBitmap,1080,2076, 0, -1080,surfaceHolder,true,false);
+
+        //entityList.add(bg1);
+        //entityList.add(bg2);
+
+        Player player = new Player("Player",playerBitmap,frameH,frameW, screenWidth / 2, screenHeight / 2,surfaceHolder,true,true);
         entityList.add(player);
 
         for(int i = 0; i < maxFireCount; i++)
         {
-            entityList.add(new Fire(fireBitmap,frameH,frameW, screenWidth,0,surfaceHolder,false));
+            entityList.add(new Fire("Fire",fireBitmap,frameH,frameW, screenWidth,0,surfaceHolder,false,true));
         }
+
+
+        Log.d("GameView", "ScreenHeight: " + screenHeight);
+        Log.d("GameView", "ScreenWidth: " + screenWidth);
     }
 
     @Override
@@ -139,16 +161,23 @@ public class GameView extends SurfaceView implements Runnable {
             spawnTimer = new Random().nextInt((spawnTimerMax - spawnTimerMin) + 1) + spawnTimerMin;
         }
 
-        for (int i = 1; i < entityList.size(); i++)
+        for (int i = 0; i < entityList.size(); i++)
         {
             if (entityList.get(i).GetIsAlive())
             {
                 entityList.get(i).Move(fps);
+                entityList.get(i).GetSteerInput(steerVelocity);
 
-                if (entityList.get(0).isCollision(entityList.get(i).xPos,entityList.get(i).yPos))
+                if (entityList.get(i).canCollide && entityList.get(i + 1).canCollide)
                 {
-                    entityList.get(i).SetAlive(false);
-                    entityList.get(0).SetAlive(false);
+                    if (entityList.get(i).isCollision(entityList.get(i + 1).xPos,entityList.get(i + 1).yPos))
+                    {
+                        if (entityList.get(i).GetName() == "Player")
+                        {
+                            entityList.get(i).SetAlive(false);
+                            entityList.get(i + 1).SetAlive(false);
+                        }
+                    }
                 }
             }
             else
@@ -162,8 +191,6 @@ public class GameView extends SurfaceView implements Runnable {
             }
         }
 
-        entityList.get(0).Move(steerVelocity);
-
     }
 
     private void draw()
@@ -172,29 +199,38 @@ public class GameView extends SurfaceView implements Runnable {
         {
             canvas = surfaceHolder.lockCanvas();
             canvas.drawColor(Color.WHITE);
-            if (!entityList.get(0).isAlive)
+
+            //Show score if the player is alive
+            for (int i = 0; i < entityList.size(); i++)
             {
-                SharedPreferences settings = activity.getApplicationContext().getSharedPreferences("ScorePrefs",0);
-                float currentHighScore = settings.getFloat("HighScore",0);
-                if (currentHighScore > highScore)
+                if (entityList.get(i).entityName == "Player")
                 {
-                    highScore = currentHighScore;
+                    if (!entityList.get(i).isAlive)
+                    {
+                        SharedPreferences settings = activity.getApplicationContext().getSharedPreferences("ScorePrefs",0);
+                        float currentHighScore = settings.getFloat("HighScore",0);
+                        if (currentHighScore > highScore)
+                        {
+                            highScore = currentHighScore;
+                        }
+
+                        canvas.drawText("Highscore : " + (int)highScore, screenWidth / 2,100,scorePaint);
+
+                        canvas.drawBitmap(restartBitmap,null, restartButton,null);
+                        canvas.drawBitmap(quitBitmap,null, quitButton,null);
+                    }
+                    else
+                    {
+                        score = score + 0.1f;
+                        SharedPreferences settings = activity.getApplicationContext().getSharedPreferences("ScorePrefs",0);
+                        SharedPreferences.Editor editor = settings.edit();
+                        editor.putFloat("HighScore",score);
+
+                        editor.apply();
+                    }
                 }
-
-                canvas.drawText("Highscore : " + (int)highScore, screenWidth / 2,100,scorePaint);
-
-                canvas.drawBitmap(restartBitmap,null, restartButton,null);
-                canvas.drawBitmap(quitBitmap,null, quitButton,null);
             }
-            else
-            {
-                score = score + 0.1f;
-                SharedPreferences settings = activity.getApplicationContext().getSharedPreferences("ScorePrefs",0);
-                SharedPreferences.Editor editor = settings.edit();
-                editor.putFloat("HighScore",score);
 
-                editor.apply();
-            }
             for (int i = 0; i < entityList.size(); i++)
             {
                 entityList.get(i).draw(canvas);
@@ -281,7 +317,6 @@ public class GameView extends SurfaceView implements Runnable {
             // 57.2957795 degrees = 1 radian
 
             float Y = orientation[1] *  57.2957795f;
-            Log.d("Orientation", "onSensorChanged: " + Y);
 
             steerVelocity = -Y;
         }
