@@ -40,8 +40,8 @@ public class GameView extends SurfaceView implements Runnable {
     private int frameW = 50;
     private int frameH = 50;
     private int frameCount = 1;
-    private int spawnTimerMax = 5;
-    private int spawnTimerMin = 1;
+    private int spawnTimerMax = 2;
+    private int spawnTimerMin = 0;
     private float spawnTimer;
     private int screenWidth;
     private int screenHeight;
@@ -103,15 +103,15 @@ public class GameView extends SurfaceView implements Runnable {
         SharedPreferences settings = context.getSharedPreferences("ScorePrefs",0);
         highScore = settings.getFloat("HighScore",0);
 
+
         score = 0;
 
         //Add Player,Fire and the background into the entity list
 
         Background bg1 = new Background("BG1",backgroundBitmap,1080,2076, 0, 0,surfaceHolder,true,false);
+        entityList.add(bg1);
         Background bg2 = new Background("BG2",backgroundBitmap,1080,2076, 0, -1080,surfaceHolder,true,false);
-
-        //entityList.add(bg1);
-        //entityList.add(bg2);
+        entityList.add(bg2);
 
         Player player = new Player("Player",playerBitmap,frameH,frameW, screenWidth / 2, screenHeight / 2,surfaceHolder,true,true);
         entityList.add(player);
@@ -208,6 +208,12 @@ public class GameView extends SurfaceView implements Runnable {
             canvas = surfaceHolder.lockCanvas();
             canvas.drawColor(Color.WHITE);
 
+            for (int i = 0; i < entityList.size(); i++)
+            {
+                entityList.get(i).draw(canvas);
+
+            }
+
             //Show score if the player is alive
             for (int i = 0; i < entityList.size(); i++)
             {
@@ -239,11 +245,6 @@ public class GameView extends SurfaceView implements Runnable {
                 }
             }
 
-            for (int i = 0; i < entityList.size(); i++)
-            {
-                entityList.get(i).draw(canvas);
-
-            }
             canvas.drawText("Score : " + (int)score, screenWidth / 2,50,scorePaint);
             surfaceHolder.unlockCanvasAndPost(canvas);
         }

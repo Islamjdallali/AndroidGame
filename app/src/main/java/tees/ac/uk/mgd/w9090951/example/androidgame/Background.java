@@ -9,19 +9,19 @@ public class Background extends Entities
     public Background(String n,Bitmap bm, int height, int width, int startPosX, int startPosY, SurfaceHolder holder, boolean startIsAlive,boolean collide)
     {
         super(n,bm, height, width, startPosX, startPosY, holder, startIsAlive,collide);
-        velocity = 500;
+        velocity = 20;
     }
 
     @Override
     public void Move(float fps)
     {
-        yPos += velocity / fps;
+        yPos += velocity;
 
         Log.d("BG", "Move: " + yPos);
 
         if (yPos > frameH)
         {
-            yPos = 0;
+            yPos = -1080;
         }
     }
 
