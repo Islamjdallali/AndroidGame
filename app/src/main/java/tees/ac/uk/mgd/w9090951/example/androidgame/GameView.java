@@ -168,14 +168,17 @@ public class GameView extends SurfaceView implements Runnable {
                 entityList.get(i).Move(fps);
                 entityList.get(i).GetSteerInput(steerVelocity);
 
-                if (entityList.get(i).canCollide && entityList.get(i + 1).canCollide)
+                for (int j = i + 1; j < entityList.size(); j++)
                 {
-                    if (entityList.get(i).isCollision(entityList.get(i + 1).xPos,entityList.get(i + 1).yPos))
+                    if (entityList.get(i).canCollide && entityList.get(j).canCollide)
                     {
-                        if (entityList.get(i).GetName() == "Player")
+                        if (entityList.get(i).isCollision(entityList.get(j).xPos,entityList.get(j).yPos))
                         {
-                            entityList.get(i).SetAlive(false);
-                            entityList.get(i + 1).SetAlive(false);
+                            if (entityList.get(i).GetName() == "Player")
+                            {
+                                entityList.get(i).SetAlive(false);
+                                entityList.get(j).SetAlive(false);
+                            }
                         }
                     }
                 }
