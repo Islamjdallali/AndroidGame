@@ -68,7 +68,7 @@ public class GameView extends SurfaceView implements Runnable {
     public GameView(Context context, Activity act) {
         super(context);
         onSwipeTouchListener = new OnSwipeTouchListener(context);
-        spawnTimer = new Random().nextInt((spawnTimerMax - spawnTimerMin) + 1) + spawnTimerMin;
+        spawnTimer = new Random().nextFloat() * (spawnTimerMax - spawnTimerMin) + spawnTimerMin;
         tileSensor = new TileSensor(context);
         Log.d("Spawner : ", String.valueOf(spawnTimer));
         screenWidth = context.getResources().getDisplayMetrics().widthPixels;
@@ -80,7 +80,7 @@ public class GameView extends SurfaceView implements Runnable {
         fireBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.fire);
         fireBitmap = Bitmap.createScaledBitmap(fireBitmap,frameW * frameCount,frameH,false);
 
-        backgroundBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.background);
+        backgroundBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.background2);
         backgroundBitmap = Bitmap.createScaledBitmap(backgroundBitmap,2076,1080,false);
 
         restartBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.restart);
@@ -160,7 +160,7 @@ public class GameView extends SurfaceView implements Runnable {
                 }
             }
 
-            spawnTimer = new Random().nextInt((spawnTimerMax - spawnTimerMin) + 1) + spawnTimerMin;
+            spawnTimer = new Random().nextFloat() * (spawnTimerMax - spawnTimerMin) + spawnTimerMin;
         }
 
         for (int i = 0; i < entityList.size(); i++)
