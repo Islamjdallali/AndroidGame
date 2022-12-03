@@ -23,7 +23,7 @@ public abstract class Entities
     private Rect frameToDraw = new Rect(0,0,frameW,frameH);
     private Rect whereToDraw = new Rect((int)xPos,(int)yPos, (int)xPos + frameW, frameH);
     private long lastFrameChangeTime = 1;
-    private long frameLengthInMs = 50;
+    private long frameLengthInMs = 100;
     private SurfaceHolder surfaceHolder;
     protected boolean isAlive;
     protected boolean canCollide;
