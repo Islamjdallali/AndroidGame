@@ -6,9 +6,9 @@ import android.view.SurfaceHolder;
 
 public class Background extends Entities
 {
-    public Background(String n,Bitmap bm, int height, int width, int startPosX, int startPosY, SurfaceHolder holder, boolean startIsAlive,boolean collide)
+    public Background(String n,Bitmap bm, int height, int width,int frameC, int startPosX, int startPosY, SurfaceHolder holder, boolean startIsAlive,boolean collide)
     {
-        super(n,bm, height, width, startPosX, startPosY, holder, startIsAlive,collide);
+        super(n,bm, height, width, frameC, startPosX, startPosY, holder, startIsAlive,collide);
         velocity = 20;
     }
 

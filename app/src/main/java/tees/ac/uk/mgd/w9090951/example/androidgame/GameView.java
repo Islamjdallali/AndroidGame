@@ -77,8 +77,8 @@ public class GameView extends SurfaceView implements Runnable {
         //Get all of the relevant bitmaps
         playerBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.player);
         playerBitmap = Bitmap.createScaledBitmap(playerBitmap,frameW * frameCount,frameH,false);
-        fireBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.fire);
-        fireBitmap = Bitmap.createScaledBitmap(fireBitmap,frameW * frameCount,frameH,false);
+        fireBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.testfireball);
+        fireBitmap = Bitmap.createScaledBitmap(fireBitmap,150,50,false);
 
         backgroundBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.background2);
         backgroundBitmap = Bitmap.createScaledBitmap(backgroundBitmap,2076,1080,false);
@@ -108,17 +108,17 @@ public class GameView extends SurfaceView implements Runnable {
 
         //Add Player,Fire and the background into the entity list
 
-        Background bg1 = new Background("BG1",backgroundBitmap,1080,2076, 0, 0,surfaceHolder,true,false);
-        entityList.add(bg1);
-        Background bg2 = new Background("BG2",backgroundBitmap,1080,2076, 0, -1080,surfaceHolder,true,false);
-        entityList.add(bg2);
+        Background bg1 = new Background("BG1",backgroundBitmap,1080,2076,1, 0, 0,surfaceHolder,true,false);
+        //entityList.add(bg1);
+        Background bg2 = new Background("BG2",backgroundBitmap,1080,2076,1, 0, -1080,surfaceHolder,true,false);
+        //entityList.add(bg2);
 
-        Player player = new Player("Player",playerBitmap,frameH,frameW, screenWidth / 2, screenHeight / 2,surfaceHolder,true,true);
+        Player player = new Player("Player",playerBitmap,frameH,frameW,1, screenWidth / 2, screenHeight / 2,surfaceHolder,true,true);
         entityList.add(player);
 
         for(int i = 0; i < maxFireCount; i++)
         {
-            entityList.add(new Fire("Fire",fireBitmap,frameH,frameW, screenWidth,0,surfaceHolder,false,true));
+            entityList.add(new Fire("Fire",fireBitmap,50,50,3, screenWidth,0,surfaceHolder,false,true));
         }
 
 
@@ -211,7 +211,6 @@ public class GameView extends SurfaceView implements Runnable {
             for (int i = 0; i < entityList.size(); i++)
             {
                 entityList.get(i).draw(canvas);
-
             }
 
             //Show score if the player is alive

@@ -10,9 +10,9 @@ public class Fire extends Entities
 {
     private int screenWidth;
 
-    public Fire(String n,Bitmap bm, int height, int width, int startPosX, int startPosY, SurfaceHolder holder, boolean startIsAlive, boolean collide)
+    public Fire(String n,Bitmap bm, int height, int width,int frameC, int startPosX, int startPosY, SurfaceHolder holder, boolean startIsAlive, boolean collide)
     {
-        super(n,bm, height, width, startPosX, startPosY, holder,startIsAlive,collide);
+        super(n,bm, height, width, frameC, startPosX, startPosY, holder,startIsAlive,collide);
         screenWidth = startPosX;
         xPos = new Random().nextInt(screenWidth);
         velocity = 500;

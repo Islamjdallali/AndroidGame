@@ -5,6 +5,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Rect;
+import android.util.Log;
 import android.view.SurfaceHolder;
 
 public abstract class Entities
@@ -21,15 +22,15 @@ public abstract class Entities
     protected float velocity;
     private Rect frameToDraw = new Rect(0,0,frameW,frameH);
     private Rect whereToDraw = new Rect((int)xPos,(int)yPos, (int)xPos + frameW, frameH);
-    private float lastFrameChangeTime = 1;
-    private float frameLengthInMs = 2;
+    private long lastFrameChangeTime = 1;
+    private long frameLengthInMs = 50;
     private SurfaceHolder surfaceHolder;
     protected boolean isAlive;
     protected boolean canCollide;
 
     protected String entityName;
 
-    public Entities(String name,Bitmap bm, int height, int width, int startPosX, int startPosY, SurfaceHolder holder, boolean startIsAlive,boolean collide)
+    public Entities(String name,Bitmap bm, int height, int width,int frameC, int startPosX, int startPosY, SurfaceHolder holder, boolean startIsAlive,boolean collide)
     {
         entityName = name;
         surfaceHolder = holder;
@@ -42,6 +43,8 @@ public abstract class Entities
         yPos = startPosY;
         isAlive = startIsAlive;
         canCollide = collide;
+        frameCount = frameC;
+        currentFrame = 0;
     }
 
     public void draw(Canvas canvas)
@@ -98,14 +101,20 @@ public abstract class Entities
     private void manageFrame()
     {
         long time = System.currentTimeMillis();
-        if (time > lastFrameChangeTime + frameLengthInMs)
+
+        if (time > (lastFrameChangeTime + frameLengthInMs))
         {
-            lastFrameChangeTime = time;
-            currentFrame++;
+            currentFrame += 1;
+
+            Log.d("Animation", "Time: " + time);
+            Log.d("Animation", "target Time: " + (lastFrameChangeTime + frameLengthInMs));
+
             if (currentFrame >= frameCount)
             {
                 currentFrame = 0;
             }
+
+            lastFrameChangeTime = time;
         }
 
         frameToDraw.left = currentFrame * frameW;
