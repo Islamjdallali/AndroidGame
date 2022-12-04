@@ -11,11 +11,16 @@ public class Player extends Entities
         super(n,bm, height, width, frameC, startPosX, startPosY, holder,startIsAlive,collide);
     }
 
+    private float dashSpeed;
+    private float dashDistance;
+    private float endPos;
+    private float gameFps;
+
     @Override
     public void Move(float fps)
     {
+        gameFps = fps;
         xPos += velocity;
-
     }
 
     @Override
@@ -26,6 +31,20 @@ public class Player extends Entities
 
     public void Dash(float dashLength)
     {
-        xPos += dashLength;
+        //if we are dashing to the right
+        if (dashLength > 0)
+        {
+            endPos = xPos + dashLength;
+            dashDistance = Math.abs(endPos - xPos);
+            dashSpeed = 0.005f / gameFps;
+        }
+
+        while (dashDistance > 0.1f)
+        {
+            xPos += dashSpeed;
+            dashDistance = endPos - xPos;
+        }
+
+        //xPos += dashLength;
     }
 }

@@ -106,9 +106,6 @@ public abstract class Entities
         {
             currentFrame += 1;
 
-            Log.d("Animation", "Time: " + time);
-            Log.d("Animation", "target Time: " + (lastFrameChangeTime + frameLengthInMs));
-
             if (currentFrame >= frameCount)
             {
                 currentFrame = 0;
