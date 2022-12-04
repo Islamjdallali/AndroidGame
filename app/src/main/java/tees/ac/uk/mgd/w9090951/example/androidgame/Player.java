@@ -31,20 +31,28 @@ public class Player extends Entities
 
     public void Dash(float dashLength)
     {
+        dashSpeed = 0.005f / gameFps;
+
+        //if we are dashing to the left
+        if (dashLength < 0)
+        {
+            endPos = xPos + dashLength;
+
+            while (xPos > endPos)
+            {
+                xPos -= dashSpeed;
+            }
+        }
+
         //if we are dashing to the right
         if (dashLength > 0)
         {
             endPos = xPos + dashLength;
-            dashDistance = Math.abs(endPos - xPos);
-            dashSpeed = 0.005f / gameFps;
-        }
 
-        while (dashDistance > 0.1f)
-        {
-            xPos += dashSpeed;
-            dashDistance = endPos - xPos;
+            while (xPos < endPos)
+            {
+                xPos += dashSpeed;
+            }
         }
-
-        //xPos += dashLength;
     }
 }
