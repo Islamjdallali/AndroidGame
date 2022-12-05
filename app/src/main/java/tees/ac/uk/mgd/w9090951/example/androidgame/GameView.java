@@ -2,6 +2,7 @@ package tees.ac.uk.mgd.w9090951.example.androidgame;
 
 import android.app.Activity;
 import android.content.SharedPreferences;
+import android.media.MediaPlayer;
 import android.view.View;
 import android.content.Context;
 import android.graphics.Paint;
@@ -65,6 +66,12 @@ public class GameView extends SurfaceView implements Runnable {
     private Rect quitButton;
     private Bitmap quitBitmap;
 
+    private MediaPlayer bgmusicPlayer;
+    private MediaPlayer explosionPlayer;
+    private MediaPlayer dashPlayer;
+
+    private boolean isPlayerAlive;
+
     public GameView(Context context, Activity act) {
         super(context);
         onSwipeTouchListener = new OnSwipeTouchListener(context);
@@ -121,9 +128,22 @@ public class GameView extends SurfaceView implements Runnable {
             entityList.add(new Fire("Fire",fireBitmap,50,50,3, screenWidth,0,surfaceHolder,false,true));
         }
 
+        isPlayerAlive = true;
 
-        Log.d("GameView", "ScreenHeight: " + screenHeight);
-        Log.d("GameView", "ScreenWidth: " + screenWidth);
+        //get the revelant music files
+        bgmusicPlayer = MediaPlayer.create(context,R.raw.bgmusic);
+        explosionPlayer = MediaPlayer.create(context,R.raw.explosion);
+        dashPlayer = MediaPlayer.create(context,R.raw.dash);
+
+        //loop and start the bg music
+        if (!bgmusicPlayer.isLooping())
+        {
+            bgmusicPlayer.setLooping(true);
+        }
+        bgmusicPlayer.start();
+
+        //Log.d("GameView", "ScreenHeight: " + screenHeight);
+        //Log.d("GameView", "ScreenWidth: " + screenWidth);
     }
 
     @Override
@@ -178,8 +198,10 @@ public class GameView extends SurfaceView implements Runnable {
                         {
                             if (entityList.get(i).GetName() == "Player")
                             {
+                                explosionPlayer.start();
                                 entityList.get(i).SetAlive(false);
                                 entityList.get(j).SetAlive(false);
+                                isPlayerAlive = false;
                             }
                         }
                     }
@@ -213,35 +235,28 @@ public class GameView extends SurfaceView implements Runnable {
                 entityList.get(i).draw(canvas);
             }
 
-            //Show score if the player is alive
-            for (int i = 0; i < entityList.size(); i++)
+            if (isPlayerAlive)
             {
-                if (entityList.get(i).entityName == "Player")
+                score = score + 0.1f;
+                SharedPreferences settings = activity.getApplicationContext().getSharedPreferences("ScorePrefs",0);
+                SharedPreferences.Editor editor = settings.edit();
+                editor.putFloat("HighScore",score);
+
+                editor.apply();
+            }
+            else
+            {
+                SharedPreferences settings = activity.getApplicationContext().getSharedPreferences("ScorePrefs",0);
+                float currentHighScore = settings.getFloat("HighScore",0);
+                if (currentHighScore > highScore)
                 {
-                    if (!entityList.get(i).isAlive)
-                    {
-                        SharedPreferences settings = activity.getApplicationContext().getSharedPreferences("ScorePrefs",0);
-                        float currentHighScore = settings.getFloat("HighScore",0);
-                        if (currentHighScore > highScore)
-                        {
-                            highScore = currentHighScore;
-                        }
-
-                        canvas.drawText("Highscore : " + (int)highScore, screenWidth / 2,100,scorePaint);
-
-                        canvas.drawBitmap(restartBitmap,null, restartButton,null);
-                        canvas.drawBitmap(quitBitmap,null, quitButton,null);
-                    }
-                    else
-                    {
-                        score = score + 0.1f;
-                        SharedPreferences settings = activity.getApplicationContext().getSharedPreferences("ScorePrefs",0);
-                        SharedPreferences.Editor editor = settings.edit();
-                        editor.putFloat("HighScore",score);
-
-                        editor.apply();
-                    }
+                    highScore = currentHighScore;
                 }
+
+                canvas.drawText("Highscore : " + (int)highScore, screenWidth / 2,100,scorePaint);
+
+                canvas.drawBitmap(restartBitmap,null, restartButton,null);
+                canvas.drawBitmap(quitBitmap,null, quitButton,null);
             }
 
             canvas.drawText("Score : " + (int)score, screenWidth / 2,50,scorePaint);
@@ -253,18 +268,25 @@ public class GameView extends SurfaceView implements Runnable {
     @Override
     public boolean onTouchEvent(MotionEvent event)
     {
-        if (restartButton.contains((int)event.getX(), (int)event.getY()))
+        if (!isPlayerAlive)
         {
-            for (int i = 0; i < entityList.size(); i++)
+            if (restartButton.contains((int)event.getX(), (int)event.getY()))
             {
-                entityList.get(i).Restart();
-                score = 0;
+                for (int i = 0; i < entityList.size(); i++)
+                {
+                    entityList.get(i).Restart();
+                    isPlayerAlive = true;
+                    score = 0;
+                }
             }
-        }
 
-        if (quitButton.contains((int)event.getX(), (int)event.getY()))
-        {
-            activity.finish();
+            if (quitButton.contains((int)event.getX(), (int)event.getY()))
+            {
+                bgmusicPlayer.stop();
+                explosionPlayer.stop();
+                dashPlayer.stop();
+                activity.finish();
+            }
         }
 
         return onSwipeTouchListener.onTouch(this, event);
@@ -433,12 +455,15 @@ public class GameView extends SurfaceView implements Runnable {
             try {
                 float diffX = e2.getX() - e1.getX();
                 if (Math.abs(diffX) > swipeThreshold) {
-                    if (diffX > 0) {
+                    if (diffX > 0)
+                    {
                         ((Player)entityList.get(0)).Dash(dashLength);
+                        dashPlayer.start();
 
                     } else
                     {
                         ((Player)entityList.get(0)).Dash(-dashLength);
+                        dashPlayer.start();
                     }
                 }
                 result = true;
