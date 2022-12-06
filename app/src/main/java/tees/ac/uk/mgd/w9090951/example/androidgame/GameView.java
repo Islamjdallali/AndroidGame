@@ -320,6 +320,8 @@ public class GameView extends SurfaceView implements Runnable {
         private float[] mag;
         private float[] rotationMatrix = new float[16];
         private float[] orientation = new float[4];
+        private float alpha = 0.5f;
+        private float orientationOutput;
 
         TileSensor(Context ctx)
         {
@@ -327,8 +329,9 @@ public class GameView extends SurfaceView implements Runnable {
             registerListeners();
         }
 
-        private float[] lowPass(float[] input, float[] output)
+        private float lowPass(float input, float output)
         {
+            output = output + alpha * (input - output);
             return output;
         }
 
@@ -346,7 +349,7 @@ public class GameView extends SurfaceView implements Runnable {
             // multiply the rotation by 1 radian
             // 57.2957795 degrees = 1 radian
 
-            float Y = orientation[1] *  57.2957795f;
+            float Y = lowPass( orientation[1],orientationOutput) *  57.2957795f;
 
             steerVelocity = -Y;
         }
