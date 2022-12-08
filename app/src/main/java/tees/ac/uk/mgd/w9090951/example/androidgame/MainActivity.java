@@ -20,6 +20,12 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+    public void LaunchHowToPlayActivity(View view)
+    {
+        Intent intent = new Intent(this,HowToPlayActivity.class);
+        startActivity(intent);
+    }
+
     public void QuitGame(View view)
     {
         finish();
