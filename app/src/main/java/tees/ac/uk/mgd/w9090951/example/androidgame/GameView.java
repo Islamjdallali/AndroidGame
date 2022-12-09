@@ -116,9 +116,9 @@ public class GameView extends SurfaceView implements Runnable {
         //Add Player,Fire and the background into the entity list
 
         Background bg1 = new Background("BG1",backgroundBitmap,1080,2076,1, 0, 0,surfaceHolder,true,false);
-        //entityList.add(bg1);
+        entityList.add(bg1);
         Background bg2 = new Background("BG2",backgroundBitmap,1080,2076,1, 0, -1080,surfaceHolder,true,false);
-        //entityList.add(bg2);
+        entityList.add(bg2);
 
         Player player = new Player("Player",playerBitmap,frameH,frameW,1, screenWidth / 2, screenHeight / 2,surfaceHolder,true,true);
         entityList.add(player);
