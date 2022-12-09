@@ -17,8 +17,6 @@ public class Background extends Entities
     {
         yPos += velocity;
 
-        Log.d("BG", "frame height: " + frameH);
-
         if (yPos > frameH)
         {
             yPos = -1080;

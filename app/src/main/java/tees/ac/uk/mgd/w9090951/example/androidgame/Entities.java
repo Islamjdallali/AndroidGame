@@ -11,8 +11,8 @@ import android.view.SurfaceHolder;
 public abstract class Entities
 {
     private Bitmap entityBitmap;
-    protected int frameW = 50;
-    protected int frameH = 50;
+    protected int frameW;
+    protected int frameH;
     private int frameCount = 1;
     private int currentFrame = 0;
     protected float xPos;
@@ -20,8 +20,8 @@ public abstract class Entities
     protected float startXPos;
     protected float startYPos;
     protected float velocity;
-    private Rect frameToDraw = new Rect(0,0,frameW,frameH);
-    private Rect whereToDraw = new Rect((int)xPos,(int)yPos, (int)xPos + frameW, frameH);
+    private Rect frameToDraw;
+    private Rect whereToDraw;
     private long lastFrameChangeTime = 1;
     private long frameLengthInMs = 100;
     private SurfaceHolder surfaceHolder;
@@ -45,6 +45,9 @@ public abstract class Entities
         canCollide = collide;
         frameCount = frameC;
         currentFrame = 0;
+
+        frameToDraw = new Rect(0,0,frameW,frameH);
+        whereToDraw = new Rect((int)xPos,(int)yPos, (int)xPos + frameW, frameH);
     }
 
     public void draw(Canvas canvas)
@@ -54,6 +57,7 @@ public abstract class Entities
             if (surfaceHolder.getSurface().isValid())
             {
                 whereToDraw.set((int)xPos,(int)yPos,(int)xPos + frameW, (int) yPos + frameH);
+
                 manageFrame();
                 canvas.drawBitmap(entityBitmap,frameToDraw,whereToDraw,null);
             }
@@ -81,6 +85,11 @@ public abstract class Entities
     {
         xPos = x;
         yPos = y;
+    }
+
+    public void SetSpeed(float newSpeed)
+    {
+        velocity = newSpeed;
     }
 
     public String GetName()

@@ -38,11 +38,11 @@ public class GameView extends SurfaceView implements Runnable {
     private Bitmap playerBitmap;
     private Bitmap fireBitmap;
     private Bitmap backgroundBitmap;
-    private int frameW = 50;
-    private int frameH = 50;
+    private int frameW = 100;
+    private int frameH = 100;
     private int frameCount = 1;
-    private int spawnTimerMax = 2;
-    private int spawnTimerMin = 0;
+    private float spawnTimerMax = 2;
+    private float spawnTimerMin = 0;
     private float spawnTimer;
     private int screenWidth;
     private int screenHeight;
@@ -164,6 +164,13 @@ public class GameView extends SurfaceView implements Runnable {
 
     private void update()
     {
+        SpawnFire();
+        IncreaseDifficulty();
+        CollisionDetection();
+    }
+
+    private void SpawnFire()
+    {
         spawnTimer -= 1 / fps;
 
         if (spawnTimer <= 0)
@@ -182,7 +189,67 @@ public class GameView extends SurfaceView implements Runnable {
 
             spawnTimer = new Random().nextFloat() * (spawnTimerMax - spawnTimerMin) + spawnTimerMin;
         }
+    }
 
+    private void IncreaseDifficulty()
+    {
+        //increase speed of fire and make them spawn more often the higher the players score
+        if (score < 100)
+        {
+            spawnTimerMin = 1;
+            spawnTimerMax = 3;
+
+            for(int i = 1; i < entityList.size(); i++)
+            {
+                if (entityList.get(i).GetName() == "Fire")
+                {
+                    entityList.get(i).SetSpeed(500);
+                }
+            }
+        }
+        else if (score > 100 && score < 200)
+        {
+            spawnTimerMin = 0;
+            spawnTimerMax = 2;
+
+            for(int i = 1; i < entityList.size(); i++)
+            {
+                if (entityList.get(i).GetName() == "Fire")
+                {
+                    entityList.get(i).SetSpeed(700);
+                }
+            }
+        }
+        else if (score > 200 && score < 300)
+        {
+            spawnTimerMin = 0;
+            spawnTimerMax = 1;
+
+            for(int i = 1; i < entityList.size(); i++)
+            {
+                if (entityList.get(i).GetName() == "Fire")
+                {
+                    entityList.get(i).SetSpeed(900);
+                }
+            }
+        }
+        else if (score > 300)
+        {
+            spawnTimerMin = 0;
+            spawnTimerMax = 0.5f;
+
+            for(int i = 1; i < entityList.size(); i++)
+            {
+                if (entityList.get(i).GetName() == "Fire")
+                {
+                    entityList.get(i).SetSpeed(1200);
+                }
+            }
+        }
+    }
+
+    private void CollisionDetection()
+    {
         for (int i = 0; i < entityList.size(); i++)
         {
             if (entityList.get(i).GetIsAlive())
@@ -220,7 +287,6 @@ public class GameView extends SurfaceView implements Runnable {
                 }
             }
         }
-
     }
 
     private void draw()
@@ -434,7 +500,6 @@ public class GameView extends SurfaceView implements Runnable {
 
         @Override
         public boolean onTouch(View view, MotionEvent motionEvent) {
-            Log.d("Gesture", "onTouch");
             return gestureDetector.onTouchEvent(motionEvent);
         }
     }
@@ -458,15 +523,21 @@ public class GameView extends SurfaceView implements Runnable {
             try {
                 float diffX = e2.getX() - e1.getX();
                 if (Math.abs(diffX) > swipeThreshold) {
-                    if (diffX > 0)
+                    for(int i = 1; i < entityList.size(); i++)
                     {
-                        ((Player)entityList.get(0)).Dash(dashLength);
-                        dashPlayer.start();
+                        if (entityList.get(i).GetName() == "Player")
+                        {
+                            if (diffX > 0)
+                            {
+                                ((Player)entityList.get(i)).Dash(dashLength);
+                                dashPlayer.start();
 
-                    } else
-                    {
-                        ((Player)entityList.get(0)).Dash(-dashLength);
-                        dashPlayer.start();
+                            } else
+                            {
+                                ((Player)entityList.get(i)).Dash(-dashLength);
+                                dashPlayer.start();
+                            }
+                        }
                     }
                 }
                 result = true;
